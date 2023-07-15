@@ -6,7 +6,7 @@
 
 ## 英語 data
 
-CMU Pronuncing Dictionary (CMUPD) から発音と綴りの対応関係をする抽出ための Excel 作業本:
+[CMU Pronouncing Dictionary (CMUPD)](http://www.speech.cs.cmu.edu/cgi-bin/cmudict) から発音と綴りの対応関係をする抽出ための Excel 作業本:
 
 1. [英語 (all) spell-sound 対応づけデータ](base-English-ipa-spell-pairs-r6.xlsx)
 
