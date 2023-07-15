@@ -29,11 +29,11 @@ CMU Pronuncing Dictionary (CMUPD) から発音と綴りの対応関係をする�
 
 8. [ドイツ語 (1k most commons) 1,2,3-gram](data-German-spell-sound-pairing-r1a-ngram-1k.xlsx)
 
-# paper
+# 論文/paper
 
 [PDF](https://www.jcss.gr.jp/meetings/jcss2023/proceedings/pdf/X.pdf)
 
-# poster
+# ポスター/poster
 
 [PDF](https://www.dropbox.com/X)
 
