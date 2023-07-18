@@ -9,7 +9,6 @@
 [CMU Pronouncing Dictionary (CMUPD)](http://www.speech.cs.cmu.edu/cgi-bin/cmudict) から発音と綴りの対応関係をする抽出ための Excel 作業本:
 
 1. [英語 (all) spell-sound 対応づけデータ](base-English-ipa-spell-pairs-r6.xlsx)
-
 2. [英語 (1k most commons) spell-sound 対応づけデータ (1k most common words 版) ](base-English-ipa-spell-pairs-r6-1k-mc.xlsx)
 
 [1] から構築したSpell-Sound 対応 (whole-word, 1-gram, 2-gram, 3-gram):
@@ -44,6 +43,9 @@
 # Perl scripts
 
 データ処理のためのscripts
+
+- [CMUPD のARPBBET を IPA に変換する Perl script](bin/convert-ARPABET-to-IPA.pl)
+- [IPA表記と slash表記の対からON対を抽出する Perl script](bin/extract-paired-units.pl)
 
 # Resources
 
