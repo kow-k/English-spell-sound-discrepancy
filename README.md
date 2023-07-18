@@ -12,22 +12,26 @@
 
 2. [英語 (1k most commons) spell-sound 対応づけデータ (1k most common words 版) ](base-English-ipa-spell-pairs-r6-1k-mc.xlsx)
 
-[1,2] から構築したSpell-Sound 対応 (1-gram, 2-gram, 3-gram):
+[1] から構築したSpell-Sound 対応 (whole-word, 1-gram, 2-gram, 3-gram):
 
-2. [英語 (all) 1-gram](data-English-spell-sound-pairing-r6e-1gram.xlsx)
-4. [英語 (all) 2-gram](data-English-spell-sound-pairing-r6e-2gram.xlsx)
-5. [英語 (all) 3-gram](data-English-spell-sound-pairing-r6e-3gram.xlsx)
-6. [英語 (1k most commons) 1,2,3-gram](data-English-spell-sound-pairing-r6e-ngram-1k.xlsx)
+3. [英語 (all) whole word](base-pairs-bundled-r6e.csv)
+4. [英語 (all) 1-gram](data-English-spell-sound-pairing-r6e-1gram.xlsx)
+5. [英語 (all) 2-gram](data-English-spell-sound-pairing-r6e-2gram.xlsx)
+6. [英語 (all) 3-gram](data-English-spell-sound-pairing-r6e-3gram.xlsx)
+
+[2] から構築したSpell-Sound 対応 (1-gram, 2-gram, 3-gram):
+
+7. [英語 (1k most commons) 1,2,3-gram](data-English-spell-sound-pairing-r6e-ngram-1k.xlsx)
 
 ## ドイツ語データ
 
 1k most common words のドイツ語版の，発音と綴りの対応関係をする抽出ための Excel 作業本:
 
-7. [ドイツ語 (1k most commons) spell-sound 対応づけデータ](base-German-ipa-spell-pairs-r1-1k-mc.xlsx)
+8. [ドイツ語 (1k most commons) spell-sound 対応づけデータ](base-German-ipa-spell-pairs-r1-1k-mc.xlsx)
 
-[7] から構築したドイツ語の spell-sound 対応 (1-gram, 2-gram, 3-gram):
+[8] から構築したドイツ語の spell-sound 対応 (1-gram, 2-gram, 3-gram):
 
-8. [ドイツ語 (1k most commons) 1,2,3-gram](data-German-spell-sound-pairing-r1a-ngram-1k.xlsx)
+9. [ドイツ語 (1k most commons) 1,2,3-gram](data-German-spell-sound-pairing-r1a-ngram-1k.xlsx)
 
 # 論文/paper
 
