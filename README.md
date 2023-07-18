@@ -32,14 +32,6 @@
 
 9. [ドイツ語 (1k most commons) 1,2,3-gram](data-German-spell-sound-pairing-r1a-ngram-1k.xlsx)
 
-# 論文/paper
-
-[PDF](https://www.jcss.gr.jp/meetings/jcss2023/proceedings/pdf/X.pdf)
-
-# ポスター/poster
-
-[PDF](https://www.dropbox.com/X)
-
 # Perl scripts
 
 データ処理のためのscripts
@@ -53,3 +45,10 @@
 
 [1k most common words (site)](https://1000mostcommonwords.com/)
 
+# 論文/paper
+
+[PDF](https://www.jcss.gr.jp/meetings/jcss2023/proceedings/pdf/X.pdf)
+
+# ポスター/poster
+
+[PDF](https://www.dropbox.com/X)
