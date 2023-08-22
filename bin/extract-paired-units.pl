@@ -18,8 +18,8 @@
 # 2023/02/14: implemented trigram mode
 # 2023/02/16: made h as V optional; fixed a bug in bigram, trigram modes
 # 2023/04/08: modified freq_leader to accept \d+; added handling of /ɜ/
-
-#
+# 2023/08/10: added /y/ to Vchar clases
+## declarations
 use strict ;
 use warnings ;
 use Getopt::Long ;
@@ -35,7 +35,14 @@ binmode STDOUT, ":$enc" ;
 binmode STDERR, ":$enc" ;
 #use Encode qw(decode_utf8) ; # Stackoverflow
 
-# variables
+## variables
+# $r_as_H = 0 ; # treats [h] as a vowel
+# $r_as_V = 0 ; # treats [ɹ] as a vowel
+my $Vchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
+my $VcharPlusH  = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
+my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;  # picks up /ɹ/ alone successfully
+my $VcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;
+#
 my $leader_sep = ": " ;
 #my $freq_leader = "\ +\d+\ +" ; # failed to work due to offensive \d
 my $freq_leader = "(^\ *[1-9][0-9]*\ +|^[0-9]+,)" ;
@@ -43,17 +50,11 @@ my $sep0  = "[,\t]" ; # handles csv and tsv files
 my $vseq  = "," ;
 my $fseq  = ";" ;
 my $ipa_sep = "[0123#]" ;
-my $word_sep = "[/#]" ;
+my $spell_sep = "[/#]" ;
 my $joint = ":";
 my $v_bond  = "~" ;
 my $void  = "#" ;
 my $missing = "_";
-# $r_as_H = 0 ; # treats [h] as a vowel
-# $r_as_V = 0 ; # treats [ɹ] as a vowel
-my $Vchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
-my $VcharPlusH  = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
-my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;  # picks up /ɹ/ alone successfully
-my $VcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;
 #
 my %args = ( debug => 0, verbose => 0, r_as_V => 0, h_as_V => 0 );
 GetOptions(\%args,
@@ -71,52 +72,45 @@ GetOptions(\%args,
 
 ## handle implications
 if ( $args{debug} ) { $args{verbose} = 1 ; }
-
-##
+#
 #my $file = shift ; # selects input file
 #print "#input file: $file" if $args{debug} ;
 #open my $data, $file or die "Can't open $file: $!" ;
 
 ## main
 my ($i, $j) = (0, 0) ;
-#while ( my $line = <$data> ) {
 while ( my $line = <> ) {
-   print $line if $args{debug} ;
-   chomp $line ;
-   next if $line =~ /^[#%]/ ; # ignores comment lines
-   # remove freq_leader
-   #$line =~ s/\ +\d+\ +// ;
-   $line =~ s/$freq_leader// ;
-   #
-   my ($leader, $pair_raw) ;
+   print $line if $args{debug};
+   chomp $line;
+   next if $line =~ /^[#%]/; # ignores comment lines
+   ## remove freq_leader
+   $line =~ s/$freq_leader//;
+   my ($leader, $pair_raw);
    if ( $line =~ /$leader_sep/ ) {
-      my @seg = split $leader_sep, $line ;
-      $leader = $seg[0] ;
-      $pair_raw = $seg[scalar @seg - 1] ;
+      my @seg = split $leader_sep, $line;
+      $leader = $seg[0];
+      $pair_raw = $seg[scalar @seg - 1];
    } else {
-      $leader = undef ;
-      $pair_raw = $line ;
+      $leader = undef;
+      $pair_raw = $line;
    }
-   # analyze input
-   my ($ipa, $slashed) = split $sep0, $pair_raw ;
-   print "# ipa: $ipa; slashed: $slashed\n" if $args{debug} ;
+   ## analyze input
+   my ($ipa, $slashed) = split $sep0, $pair_raw;
+   print "# ipa: $ipa; slashed: $slashed\n" if $args{debug};
    #
-   my ($sound, $word) ;
+   my ($sound, $spell);
    if ( $args{unstrip} ) {
       $sound = $ipa ;
-      $word  = $slashed ;
+      $spell  = $slashed ;
    }
    else {
       $sound = $ipa =~ s/$ipa_sep//gr ; # added # later
-      $word  = $slashed =~ s/$word_sep//gr ;
+      $spell  = $slashed =~ s/$spell_sep//gr ;
    }
-   # define sound-spell pair
+   ## define sound-spell pair
    my $pair ;
-   if ( $args{inverted} ) {
-      $pair = "$word$joint$sound$fseq" ;
-   } else {
-      $pair = "$sound$joint$word$fseq" ;
-   }
+   if ( $args{inverted} ) { $pair = "$spell$joint$sound$fseq" ; }
+   else { $pair = "$sound$joint$spell$fseq" ; }
    print $pair ;
    #
    my @ipa_segs = split /$ipa_sep/, $ipa ; # added # later
@@ -126,21 +120,21 @@ while ( my $line = <> ) {
          print "# ipa_seg$i: $ipa_segs[$i]\n" if defined $ipa_segs[$i];
       }
    }
-   my @word_segs = split $word_sep, $slashed ; # added # later
+   #
+   my @spell_segs = split $spell_sep, $slashed ; # added # later
    if ( $args{debug} ) {
-      for my $i ( 0 .. @word_segs ) {
-         print "# word_seg$i: $word_segs[$i]\n" if defined $word_segs[$i] ;
+      for my $i ( 0 .. @spell_segs ) {
+         print "# spell_seg$i: $spell_segs[$i]\n" if defined $spell_segs[$i] ;
       }
    }
    my @ipa_segs_orig = @ipa_segs ; # stored for vowel sequence generation
-   my @word_segs_orig = @word_segs ;
+   my @spell_segs_orig = @spell_segs ;
    ## define vowel sequence
    my @v_cluster ;
-   for $i ( 0..scalar @word_segs_orig ) {
+   for $i ( 0..scalar @spell_segs_orig ) {
       if ( $i < scalar @ipa_segs_orig ) {
          my $ipa_seg = $ipa_segs[$i] ;
          print "# ipa_seg$i: $ipa_seg\n" if $args{verbose} ;
-         #$ipa_seg = reverse $ipa_seg ;
          if ( $args{h_as_V} ) {
             if ($args{r_as_V}) {
                $ipa_seg =~ m/$VcharPlusHR\b/ ; # Crucially ...\b here.
@@ -163,60 +157,60 @@ while ( my $line = <> ) {
    ## generate bigrams
    if ( $args{bigram} ) {
       my @ipa_seg_bigrams  = generate_bigrams( \@ipa_segs ) ; # Crucially \@
-      my @word_seg_bigrams = generate_bigrams( \@word_segs ) ; # Crucially \@
-      # check
+      my @spell_seg_bigrams = generate_bigrams( \@spell_segs ) ; # Crucially \@
+      ## check
       if ( $args{debug} ) {
          foreach my $seg_bigram ( @ipa_seg_bigrams ) {
             print "# ipa_seg_bigram: $seg_bigram\n" ;
          }
-         foreach my $seg_bigram ( @word_seg_bigrams ) {
-            print "# word_seg_bigram: $seg_bigram\n" ;
+         foreach my $seg_bigram ( @spell_seg_bigrams ) {
+            print "# spell_seg_bigram: $seg_bigram\n" ;
          }
       }
-      # replace originals with bigrams
+      ## replace originals with bigrams
       if ( $args{extensive} ) {
          @ipa_segs  = ( @ipa_segs, @ipa_seg_bigrams ) ;
-         @word_segs = ( @word_segs, @word_seg_bigrams ) ;
+         @spell_segs = ( @spell_segs, @spell_seg_bigrams ) ;
       } else {
          @ipa_segs  = @ipa_seg_bigrams ;
-         @word_segs = @word_seg_bigrams ;
+         @spell_segs = @spell_seg_bigrams ;
       }
    }
    if ( $args{trigram} ) {
       my @ipa_seg_trigrams  = generate_trigrams( \@ipa_segs ) ; # Crucially \@
-      my @word_seg_trigrams = generate_trigrams( \@word_segs ) ; # Crucially \@
-      # check
+      my @spell_seg_trigrams = generate_trigrams( \@spell_segs ) ; # Crucially \@
+      ## check
       if ( $args{debug} ) {
          foreach my $seg_trigram ( @ipa_seg_trigrams ) {
             print "# ipa_seg_trigram: $seg_trigram\n" ;
          }
-         foreach my $seg_trigram ( @word_seg_trigrams ) {
-            print "# word_seg_trigram: $seg_trigram\n" ;
+         foreach my $seg_trigram ( @spell_seg_trigrams ) {
+            print "# spell_seg_trigram: $seg_trigram\n" ;
          }
       }
-      # replace originals with bigrams
+      ## replace originals with bigrams
       if ( $args{extensive} ) {
          @ipa_segs  = ( @ipa_segs, @ipa_seg_trigrams ) ;
-         @word_segs = ( @word_segs, @word_seg_trigrams ) ;
+         @spell_segs = ( @spell_segs, @spell_seg_trigrams ) ;
       } else {
          @ipa_segs  = @ipa_seg_trigrams ;
-         @word_segs = @word_seg_trigrams ;
+         @spell_segs = @spell_seg_trigrams ;
       }
    }
    ## pair ipa-spell units
    my @paired ;
-   for $i ( 0 .. ( scalar @word_segs - 1 ) ) {
+   for $i ( 0 .. ( scalar @spell_segs - 1 ) ) {
       if ( $i < scalar @ipa_segs ) {
          my $ipa_seg = $ipa_segs[$i] ;
          print "# ipa_seg$i: $ipa_seg\n" if $args{verbose} ;
       }
-      if ( any { defined } ($word_segs[$i], $ipa_segs[$i]) ) {
+      if ( any { defined } ($spell_segs[$i], $ipa_segs[$i]) ) {
          $ipa_segs[$i]  = $missing if !defined $ipa_segs[$i] ;
-         $word_segs[$i] = $missing if !defined $word_segs[$i] ;
+         $spell_segs[$i] = $missing if !defined $spell_segs[$i] ;
          if ( $args{inverted} ) {
-            $paired[$i] = $word_segs[$i] . $joint . $ipa_segs[$i] ;
+            $paired[$i] = $spell_segs[$i] . $joint . $ipa_segs[$i] ;
          } else {
-            $paired[$i] = $ipa_segs[$i] . $joint . $word_segs[$i] ;
+            $paired[$i] = $ipa_segs[$i] . $joint . $spell_segs[$i] ;
          }
       } else {
          $paired[$i] = $void . $joint. $void ;
@@ -247,10 +241,8 @@ while ( my $line = <> ) {
    print $v_bond ;
    print "\n" ;
 }
-#
-#close $data ;
 
-##
+## functions
 sub generate_bigrams {
    my @A = @{ shift() } ; # Crucially
    my @B = ( ) ;
