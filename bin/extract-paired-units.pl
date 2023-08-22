@@ -18,7 +18,9 @@
 # 2023/02/14: implemented trigram mode
 # 2023/02/16: made h as V optional; fixed a bug in bigram, trigram modes
 # 2023/04/08: modified freq_leader to accept \d+; added handling of /ɜ/
-# 2023/08/10: added /y/ to Vchar clases
+# 2023/08/10: added /y/ to Vchar classes
+# 2023/08/22: added /j/ to Vchar classes
+
 ## declarations
 use strict ;
 use warnings ;
