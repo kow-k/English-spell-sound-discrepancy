@@ -35,6 +35,7 @@ if ( $args{debug} ) { $args{verbose} = 1 ; }
 
 # IPA symbol classes defned
 my $ipaVchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
+my $ipaVcharPlusJ = "([jəɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
 my $ipaVcharPlusH  = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
 my $ipaVcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;  # picks up /ɹ/ alone successfully
 my $ipaVcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;
@@ -260,19 +261,18 @@ sub patch {
    $spellx =~ s|aw/|/aw|g;
    $spellx =~ s|o'/l|/o'l|g;
    # revert overapplication
+   $spellx =~ s|o/ne|/one|g;
    $spellx =~ s|o/reig|or/eig|g;
    $spellx =~ s|/reer/|r/ee/r|g;
    $spellx =~ s|/reer|r/eer|g;
    $spellx =~ s|//aw|/aw/|g;
    $spellx =~ s|//ew|/ew/|g;
    $spellx =~ s|//ow|/ow/|g;
-   $spellx =~ s|o/ne|/one|g;
    $spellx =~ s|//eh|/e/h|g;
    $spellx =~ s|y/e$|/ye|g;
    $spellx =~ s|yeah/|y/eah|g;
    $spellx =~ s|ye/ah/|y/eah|g;
    $spellx =~ s|b/us/ine|b/usin/e|g;
-   $spellx =~ s|/i/rem/|/i/re/m|g;
    $spellx =~ s|/i/rec/|/ir/ec/|g;
    $spellx =~ s|a/rabl|ar/abl/|g; # cares unbearable
    return $spellx;
