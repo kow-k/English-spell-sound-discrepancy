@@ -34,36 +34,37 @@ print_help() if $args{help} ;
 if ( $args{debug} ) { $args{verbose} = 1 ; }
 
 # IPA symbol classes defned
-my $ipaVchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
-my $ipaVcharPlusJ = "([jəɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
-my $ipaVcharPlusH  = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
-my $ipaVcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;  # picks up /ɹ/ alone successfully
-my $ipaVcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;
+my $ipaVchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+my $ipaVcharPlusJ = "([jəɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+my $ipaVcharPlusH  = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+my $ipaVcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  # picks up /ɹ/ alone successfully
+my $ipaVcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;
 
 # word character classes defined
-my $Vchar      = "(y|['aeiou]['aeiouy]*)";
+my $Vchar      = "(y|['aeiouäöüAEIOUÄÖÜ]['aeiouyäöüAEIOUÄÖÜ]*)";
 #my $VcharPlusX  = "(y|['aeiouw]+)"; # incompatible with wh-words
-my $VcharPlus  = "(y|['aeiou]+['aeiouyw]*)";
-my $VcharPlusY  = "(y|['aeiou]+['yw]*)";
+my $VcharPlus  = "(y|['aeiouäöüAEIOUÄÖÜ]+['aeiouywäöüAEIOUÄÖÜ]*)";
+my $VcharPlusY  = "(y|['aeiouäöüAEIOUÄÖÜ]+['ywäöüAEIOUÄÖÜ]*)";
 
 ## main
 while ( my $line = <> ) {
    next if ( $line =~ /^[%]/ or $line =~ /^\n/); # Note # has a specific purpose
    # remove comment
    $line = $line =~ s/(.+)[ \t]*%.*/$1/r;
-   print "# line: $line" if $args{debug};
+   print "# line: $line\n" if $args{debug};
    # split into fields
    chomp $line;
    # get field values
    my (@fields, $sound, $spell);
-   @fields = split ",", $line;
+   @fields = split /,/, $line;
    print "# \@fields: @fields\n" if $args{debug};
-   if ( $fields[0] =~ /\d+/ ) {
+   if ( $fields[0] =~ /^\d+$/ ) {
       $sound  = $fields[1]; $spell  = $fields[2];
    } else {
       $sound  = $fields[0]; $spell  = $fields[1];
    }
-   print "# \$sound: $sound; \$spell: $spell\n" if $args{debug};
+   print "# \$sound: $sound\n" if $args{debug};
+   print "# \$spell: $spell\n" if $args{debug};
    ## convert sound
    #$sound =~ s/\W+//ig; # this turned out to be offensive
    print "# \$sound: $sound\n" if $args{verbose};

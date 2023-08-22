@@ -19,7 +19,7 @@
 # 2023/02/16: made h as V optional; fixed a bug in bigram, trigram modes
 # 2023/04/08: modified freq_leader to accept \d+; added handling of /ɜ/
 # 2023/08/10: added /y/ to Vchar classes
-# 2023/08/22: added /j/ to Vchar classes
+# 2023/08/22: added /j/ to Vchar classes, modified to handle IPA symbols for German 
 
 ## declarations
 use strict ;
@@ -40,10 +40,10 @@ binmode STDERR, ":$enc" ;
 ## variables
 # $r_as_H = 0 ; # treats [h] as a vowel
 # $r_as_V = 0 ; # treats [ɹ] as a vowel
-my $Vchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
-my $VcharPlusH  = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+)" ;
-my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;  # picks up /ɹ/ alone successfully
-my $VcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊ]+|ɹ)" ;
+my $Vchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+my $VcharPlusH  = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  # picks up /ɹ/ alone successfully
+my $VcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;
 #
 my $leader_sep = ": " ;
 #my $freq_leader = "\ +\d+\ +" ; # failed to work due to offensive \d
