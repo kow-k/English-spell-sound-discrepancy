@@ -1,4 +1,4 @@
-# 英語とドイツ語の Onset-Nucleus 規模の音と綴りの対応づけデータ
+# 英語とドイツ語の Onset-Nucleus (ON)/Nucleous-Coda (NC) 規模の音と綴りの対応づけデータ
 
 第40会認知科学会 (2023年) の発表に関連したデータの公開
 
@@ -27,6 +27,8 @@
 - [英語 (all) whole word](base-ON-pairs-bundled-r6f.csv)
 - [英語 (all) 1-gram](data-English-spell-sound-NC-pairing-r6f-1gram.xlsx)
 
+ON=>NCの自動変換の精度は100%ではないため，若干の誤りが含まれる可能性がある．
+
 ## ドイツ語データ
 
 [4] 1k most common words のドイツ語版の，発音と綴りの対応関係をする抽出ための Excel 作業本:
@@ -43,6 +45,7 @@
 
 - [CMUPD のARPBBET を IPA に変換する Perl script](bin/convert-ARPABET-to-IPA.pl)
 - [IPA表記と slash表記の対からON対を抽出する Perl script](bin/extract-paired-units.pl)
+- [ON区切りをNC区切りに変換する Perl script](bin/convert-ON-to-NC.pl)
 
 # Resources
 
