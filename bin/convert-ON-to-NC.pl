@@ -245,10 +245,14 @@ sub patch {
    #$spellx =~ s|/yer|y/er|g;
    $spellx =~ s|er/(bcdfghjklmnpqstvxz)|/er$1|g; # likely to be offensive
    $spellx =~ s|ear/([^yaou]*)|ea/r$1|g; # exclude cases like fai/r/y, hai/r/y
+   $spellx =~ s|eir/|ei/r|g;
    $spellx =~ s|air/([^y]*)|ai/r$1|g; # exclude cases like fai/r/y, hai/r/y
    $spellx =~ s|/ry|r/y|g; # inevitable
    $spellx =~ s|/ev/ery|/ever/y|g;
-   $spellx =~ s|/(u?[aiuo])r/e|/$1/re|g;
+   #$spellx =~ s|/(u?[aiuo])r/e(/?)|/$1/re$2|g; # offensive for directory
+   $spellx =~ s|/q(u?[aiuo])r/e(/?)|q/$1/re$2|g;
+   $spellx =~ s|/i/(re[dm])|/i/$1|g;
+   $spellx =~ s|/ir/e|/i/re|g;
    $spellx =~ s|/([yw])([aeiou])|$1/$2|g;
    $spellx =~ s|/our/|/ou/r|g;
    $spellx =~ s|ow/|/ow|g;
@@ -268,7 +272,8 @@ sub patch {
    $spellx =~ s|yeah/|y/eah|g;
    $spellx =~ s|ye/ah/|y/eah|g;
    $spellx =~ s|b/us/ine|b/usin/e|g;
-   $spellx =~ s|qu/i/rem/|qu/ire/m/|g;
+   $spellx =~ s|/i/rem/|/i/re/m|g;
+   $spellx =~ s|/i/rec/|/ir/ec/|g;
    $spellx =~ s|a/rabl|ar/abl/|g; # cares unbearable
    return $spellx;
 }
