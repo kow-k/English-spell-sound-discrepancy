@@ -56,17 +56,18 @@ my $spell_sep = "[/#]" ;
 my $joint = ":";
 my $v_bond  = "~" ;
 my $void  = "#" ;
-my $missing = "_";
+my $missing = "";
 #
-my %args = ( debug => 0, verbose => 0, r_as_V => 0, h_as_V => 0 );
+my %args = ( debug => 0, verbose => 0, r_as_V => 0, h_as_V => 0, mark_missing => 0 );
 GetOptions(\%args,
-   "help",         # print help
-   "debug|d",      # runs in debug mode
-   "verbose|v",    # runs in verbose mode
-   "r_as_V|r",     # treats [ɹ] as a vowel
-   "h_as_V|h",     # treats [h] as a vowel
-   "inverted|i",   # inverts ipa-spell order in pairing
-   "unstrip|u",    # retains stress-marks and slashes
+   "help",           # print help
+   "debug|d",        # runs in debug mode
+   "verbose|v",      # runs in verbose mode
+   "r_as_V|r",       # treats [ɹ] as a vowel
+   "h_as_V|h",       # treats [h] as a vowel
+   "inverted|i",     # inverts ipa-spell order in pairing
+   "unstrip|u",      # retains stress-marks and slashes
+   "mark_missing|m", # insert _ for missing character
    "bigram|b",     # runs in bigram mode
    "trigram|t",    # runs in bigram mode
    "extensive|e"   # bigrams extend unigrams
@@ -74,6 +75,7 @@ GetOptions(\%args,
 
 ## handle implications
 if ( $args{debug} ) { $args{verbose} = 1 ; }
+if ( $args{mark_missing} ) { $missing = "_" ;}
 #
 #my $file = shift ; # selects input file
 #print "#input file: $file" if $args{debug} ;
