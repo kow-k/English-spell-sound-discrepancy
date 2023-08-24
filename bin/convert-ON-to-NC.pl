@@ -231,35 +231,44 @@ sub fill {
 sub patch {
    my $spellx = shift;
    # corrections to apply
+   ## y-ending cases
+   $spellx =~ s|/ry|r/y|g; # inevitable
+   $spellx =~ s|/ev/ery|/ever/y|g;
+   ## u-ending cases
    $spellx =~ s|([qkg])/u([aeiou])|$1u/$2|g;
-   $spellx =~ s|^uh/$|/uh|g;
-   #$spellx =~ s|eh/|/eh|g; # offensive
-   $spellx =~ s|w(o?e)h/|w/$1h|g;
-   #$spellx =~ s|oeh/|/oeh|g;
-   $spellx =~ s|oe/h|/oeh|g;
-   #$spellx =~ s|oh/|/oh|g; # offensive
-   $spellx =~ s|([kgcjsz]\|^)oh/|$1/oh|g;
-   #$spellx =~ s|oh/(n?)|/oh$1|g;
-   #$spellx =~ s|(e?a)h/|/$1h|g; # offensive
-   $spellx =~ s|ah/|/ah|g;
-   #$spellx =~ s|eah/|/eah|g;
+   ## r-ending cases
    $spellx =~ s|/y([ae])r|y/$1r|g;
    #$spellx =~ s|/yer|y/er|g;
-   $spellx =~ s|er/(bcdfghjklmnpqstvxz)|/er$1|g; # likely to be offensive
+   $spellx =~ s|er/(p[^aeiou])|/er$1|g; # likely to be offensive
    $spellx =~ s|ear/([^yaou]*)|ea/r$1|g; # exclude cases like fai/r/y, hai/r/y
    $spellx =~ s|eir/|ei/r|g;
    $spellx =~ s|air/([^y]*)|ai/r$1|g; # exclude cases like fai/r/y, hai/r/y
-   $spellx =~ s|/ry|r/y|g; # inevitable
-   $spellx =~ s|/ev/ery|/ever/y|g;
+   $spellx =~ s|/our/|/ou/r|g;
+   ## re-ending cases
    #$spellx =~ s|/(u?[aiuo])r/e(/?)|/$1/re$2|g; # offensive for directory
    $spellx =~ s|/q(u?[aiuo])r/e(/?)|q/$1/re$2|g;
    $spellx =~ s|/i/(re[dm])|/i/$1|g;
-   $spellx =~ s|/ir/e|/i/re|g;
+   $spellx =~ s|/([ie])r/e|/$1/re|g;
+   ## w-ending cases
    $spellx =~ s|/([yw])([aeiou])|$1/$2|g;
-   $spellx =~ s|/our/|/ou/r|g;
    $spellx =~ s|ow/|/ow|g;
    $spellx =~ s|ew/([^aeiou]*)|/ew$1|g;
    $spellx =~ s|aw/|/aw|g;
+   ## h-ending cases
+   $spellx =~ s|([aeiou]+h)/([^aeiou]\|$)|/$1$2|g; # effective generalization
+   #$spellx =~ s|^uh/$|/uh|g;
+   ##$spellx =~ s|eh/|/eh|g; # offensive
+   ##$spellx =~ s|w(o?e)(h[^aeiou])/|w/$1$2|g;
+   #$spellx =~ s|(o?e)(h[^aeiou])/|$1/$2|g;
+   ##$spellx =~ s|oeh/|/oeh|g;
+   #$spellx =~ s|oe/h|/oeh|g;
+   ##$spellx =~ s|oh/|/oh|g; # offensive
+   #$spellx =~ s|([kgcjsz]\|^)oh/|$1/oh|g;
+   ##$spellx =~ s|oh/(n?)|/oh$1|g;
+   ##$spellx =~ s|(e?a)h/|/$1h|g; # offensive
+   #$spellx =~ s|ah/|/ah|g;
+   ##$spellx =~ s|eah/|/eah|g;
+   ##
    $spellx =~ s|o'/l|/o'l|g;
    # revert overapplication
    $spellx =~ s|o/ne|/one|g;
