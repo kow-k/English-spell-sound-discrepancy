@@ -20,6 +20,7 @@
 # 2023/04/08: modified freq_leader to accept \d+; added handling of /ɜ/
 # 2023/08/10: added /y/ to Vchar classes
 # 2023/08/22: added /j/ to Vchar classes, modified to handle IPA symbols for German 
+# 2023/08/24: revised V matching to allow for N with tailing /ɹ/ in NC mode
 
 ## declarations
 use strict ;
@@ -37,14 +38,7 @@ binmode STDOUT, ":$enc" ;
 binmode STDERR, ":$enc" ;
 #use Encode qw(decode_utf8) ; # Stackoverflow
 
-## variables
-# $r_as_H = 0 ; # treats [h] as a vowel
-# $r_as_V = 0 ; # treats [ɹ] as a vowel
-my $Vchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
-my $VcharPlusH  = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
-my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  # picks up /ɹ/ alone successfully
-my $VcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;
-#
+## variables and constants
 my $leader_sep = ": " ;
 #my $freq_leader = "\ +\d+\ +" ; # failed to work due to offensive \d
 my $freq_leader = "(^\ *[1-9][0-9]*\ +|^[0-9]+,)" ;
@@ -57,17 +51,26 @@ my $joint = ":";
 my $v_bond  = "~" ;
 my $void  = "#" ;
 my $missing = "";
-#
+
+## IPA matching conditions
+my $Vchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+my $VcharPlusH  = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+#my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  # picks up /ɹ/ alone successfully
+my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
+#my $VcharPlusHR = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;
+my $VcharPlusHR = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
+
+## options
 my %args = ( debug => 0, verbose => 0, r_as_V => 0, h_as_V => 0, mark_missing => 0 );
 GetOptions(\%args,
    "help",           # print help
    "debug|d",        # runs in debug mode
    "verbose|v",      # runs in verbose mode
-   "r_as_V|r",       # treats [ɹ] as a vowel
-   "h_as_V|h",       # treats [h] as a vowel
+   "r_as_V|r",       # treats [ɹ] as a vowel, effective in NC mode
+   "h_as_V|h",       # treats [h] as a vowel, effective in ON mode
    "inverted|i",     # inverts ipa-spell order in pairing
    "unstrip|u",      # retains stress-marks and slashes
-   "mark_missing|m", # insert _ for missing character
+   "mark_missing|m", # insert '_' for missing character
    "bigram|b",     # runs in bigram mode
    "trigram|t",    # runs in bigram mode
    "extensive|e"   # bigrams extend unigrams
@@ -76,10 +79,6 @@ GetOptions(\%args,
 ## handle implications
 if ( $args{debug} ) { $args{verbose} = 1 ; }
 if ( $args{mark_missing} ) { $missing = "_" ;}
-#
-#my $file = shift ; # selects input file
-#print "#input file: $file" if $args{debug} ;
-#open my $data, $file or die "Can't open $file: $!" ;
 
 ## main
 my ($i, $j) = (0, 0) ;
@@ -116,7 +115,7 @@ while ( my $line = <> ) {
    if ( $args{inverted} ) { $pair = "$spell$joint$sound$fseq" ; }
    else { $pair = "$sound$joint$spell$fseq" ; }
    print $pair ;
-   #
+   ## get IPA segments
    my @ipa_segs = split /$ipa_sep/, $ipa ; # added # later
    if ( $args{debug} ) {
       print "\n" ;
@@ -124,40 +123,53 @@ while ( my $line = <> ) {
          print "# ipa_seg$i: $ipa_segs[$i]\n" if defined $ipa_segs[$i];
       }
    }
-   #
+   ## get spell segments
    my @spell_segs = split $spell_sep, $slashed ; # added # later
    if ( $args{debug} ) {
+      #for my $spell_seg ( @spell_segs ) { print "# spell_seg: $spell_seg\n" ; }
       for my $i ( 0 .. @spell_segs ) {
          print "# spell_seg$i: $spell_segs[$i]\n" if defined $spell_segs[$i] ;
       }
    }
-   my @ipa_segs_orig = @ipa_segs ; # stored for vowel sequence generation
-   my @spell_segs_orig = @spell_segs ;
-   ## define vowel sequence
+   ## define vowel sequence, @v_cluster
+   #my @ipa_segs_orig = @ipa_segs ; # stored for vowel sequence generation
+   #my @spell_segs_orig = @spell_segs ;
    my @v_cluster ;
-   for $i ( 0..scalar @spell_segs_orig ) {
-      if ( $i < scalar @ipa_segs_orig ) {
-         my $ipa_seg = $ipa_segs[$i] ;
-         print "# ipa_seg$i: $ipa_seg\n" if $args{verbose} ;
+   for my $k ( 0 .. @ipa_segs ) {
+      print "# \$k: $k" if $args{debug};
+      my $ipa_seg = $ipa_segs[$k] ;
+      if ( defined $ipa_seg ) {
+         print "# ipa_seg: $ipa_seg\n" if $args{verbose} ;
          if ( $args{h_as_V} ) {
-            if ($args{r_as_V}) {
-               $ipa_seg =~ m/$VcharPlusHR\b/ ; # Crucially ...\b here.
-               $v_cluster[$i] = $1 ;
+            if ( $args{r_as_V} ) {
+               $ipa_seg =~ m/$VcharPlusHR/ ; # Crucially ...\b here.
+               if ( defined $1 ) {
+                  $v_cluster[$k] = $1 if ( $1 =~ /$VcharPlusHR/ );
+               } 
             } else {
                $ipa_seg =~ m/$VcharPlusH/ ;
-               $v_cluster[$i] = $1 ;
+               if ( defined $1 ) {
+                  $v_cluster[$k] = $1 if ( $1 =~ /$VcharPlusH/ );
+               } 
             }
          } else {
-            if ($args{r_as_V}) {
-               $ipa_seg =~ m/$VcharPlusR\b/ ; # Crucially ...\b here.
-               $v_cluster[$i] = $1 ;
+            if ( $args{r_as_V} ) {
+               $ipa_seg =~ m/$VcharPlusR/ ; # Crucially ...\b here.
+               if ( defined $1 ) {
+                  $v_cluster[$k] = $1 if ( $1 =~ /$VcharPlusR/ ) ;
+               }
             } else {
-               $ipa_seg =~ m/$Vchar/ ; # plain mode
-               $v_cluster[$i] = $1 ;
+               $ipa_seg =~ m/$Vchar/ ; # plain mode }
+               if ( defined $1 ) {
+                  $v_cluster[$k] = $1 if ( $1 =~ /$Vchar/ ) ;
+               }
             }
          }
+         #$v_cluster[$k] = $1 ; returns digits like "1", "2"
       }
    }
+   print "# \@v_cluster: @v_cluster\n" if $args{debug};
+   ##
    ## generate bigrams
    if ( $args{bigram} ) {
       my @ipa_seg_bigrams  = generate_bigrams( \@ipa_segs ) ; # Crucially \@
