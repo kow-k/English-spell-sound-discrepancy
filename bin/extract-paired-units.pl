@@ -55,10 +55,10 @@ my $missing = "";
 ## IPA matching conditions
 my $Vchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
 my $VcharPlusH  = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
-#my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  # picks up /ɹ/ alone successfully
 my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
-#my $VcharPlusHR = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;
+my $VcharPlusR2  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  # picks up /ɹ/ alone successfully
 my $VcharPlusHR = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
+my $VcharPlusHR2 = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?|ɹ)" ;
 
 ## options
 my %args = ( debug => 0, verbose => 0, r_as_V => 0, h_as_V => 0, mark_missing => 0 );
