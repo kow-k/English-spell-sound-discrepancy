@@ -33,6 +33,10 @@ print_help() if $args{help} ;
 ## handle implications
 if ( $args{debug} ) { $args{verbose} = 1 ; }
 
+# variables
+my $field_sep = "[,]" ;
+my $spell_sep = "[/#]" ;
+
 # IPA symbol classes defned
 my $ipaVchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
 my $ipaVcharPlusJ = "([jəɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
@@ -41,10 +45,10 @@ my $ipaVcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  
 my $ipaVcharPlusHR = "([həɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;
 
 # word character classes defined
-my $Vchar      = "(y|['aeiouäöüAEIOUÄÖÜ]['aeiouyäöüAEIOUÄÖÜ]*)";
+my $Vchar      = "(y|[aeiouäöüAEIOUÄÖÜ][aeiouyäöüAEIOUÄÖÜ]*)";
 #my $VcharPlusX  = "(y|['aeiouw]+)"; # incompatible with wh-words
-my $VcharPlus  = "(y|['aeiouäöüAEIOUÄÖÜ]+['aeiouywäöüAEIOUÄÖÜ]*)";
-my $VcharPlusY  = "(y|['aeiouäöüAEIOUÄÖÜ]+['ywäöüAEIOUÄÖÜ]*)";
+my $VcharPlus  = "(y|[aeiouäöüAEIOUÄÖÜ]+[aeiouywäöüAEIOUÄÖÜ]*)";
+my $VcharPlusY  = "(y|[aeiouäöüAEIOUÄÖÜ]+[ywäöüAEIOUÄÖÜ]*)";
 
 ## main
 while ( my $line = <> ) {
@@ -56,7 +60,7 @@ while ( my $line = <> ) {
    chomp $line;
    # get field values
    my (@fields, $sound, $spell);
-   @fields = split /,/, $line;
+   @fields = split /$field_sep/, $line;
    print "# \@fields: @fields\n" if $args{debug};
    if ( $fields[0] =~ /^\d+$/ ) {
       $sound  = $fields[1]; $spell  = $fields[2];
@@ -167,6 +171,7 @@ sub analyze_spell {
    my (@cv_list, @x_list, @encoding);
    for my $c ( split "", $spell ) {
       print "# c: $c\n" if $args{debug};
+      #if ( $c eq  "/" or $c eq "#" ) { # offensive if # is treated properly
       if ( $c eq  "/" ) { # treat # as consonant
          push @x_list, $c; push @encoding, "x";
       } else {
@@ -250,12 +255,13 @@ sub patch {
    $spellx =~ s|/i/(re[dm])|/i/$1|g;
    $spellx =~ s|/([ie])r/e|/$1/re|g;
    ## w-ending cases
+   #$spellx =~ s|aw/|/aw|g;
+   #$spellx =~ s|ow/|/ow|g;
+   #$spellx =~ s|ew/([^aeiou]*)|/ew$1|g;
+   $spellx =~ s|([aeo]?)w/([^aeiou]\|$)|/$1w$2|g;
    $spellx =~ s|/([yw])([aeiou])|$1/$2|g;
-   $spellx =~ s|ow/|/ow|g;
-   $spellx =~ s|ew/([^aeiou]*)|/ew$1|g;
-   $spellx =~ s|aw/|/aw|g;
    ## h-ending cases
-   $spellx =~ s|([aeiou]+h)/([^aeiou]\|$)|/$1$2|g; # effective generalization
+   $spellx =~ s|([aeiouy]+h)/([^aeiouy])|/$1$2|g; # effective generalization
    #$spellx =~ s|^uh/$|/uh|g;
    ##$spellx =~ s|eh/|/eh|g; # offensive
    ##$spellx =~ s|w(o?e)(h[^aeiou])/|w/$1$2|g;
@@ -270,8 +276,10 @@ sub patch {
    ##$spellx =~ s|eah/|/eah|g;
    ##
    $spellx =~ s|o'/l|/o'l|g;
+   $spellx =~ s|y'/k|y/'k|g;
    # revert overapplication
    $spellx =~ s|o/ne|/one|g;
+   $spellx =~ s|ow/e$|/owe|g;
    $spellx =~ s|o/reig|or/eig|g;
    $spellx =~ s|/reer/|r/ee/r|g;
    $spellx =~ s|/reer|r/eer|g;
@@ -285,6 +293,7 @@ sub patch {
    $spellx =~ s|b/us/ine|b/usin/e|g;
    $spellx =~ s|/i/rec/|/ir/ec/|g;
    $spellx =~ s|a/rabl|ar/abl/|g; # cares unbearable
+   #
    return $spellx;
 }
 
