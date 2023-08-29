@@ -10,13 +10,13 @@
 use strict;
 use warnings;
 use utf8;
-#use List::MoreUtils qw/firstidx lastidx/;
+use open IO => ":utf8" ;
+#use open IO => ":$enc" ; # doesn't work
 my $enc = "utf8" ;
 binmode STDIN, ":$enc" ;
 binmode STDOUT, ":$enc" ;
 binmode STDERR, ":$enc" ;
-use open IO => ":utf8" ;
-#use open IO => ":$enc" ; # doesn't work
+#use List::MoreUtils qw/firstidx lastidx/;
 
 # handle options
 use Getopt::Long ;
