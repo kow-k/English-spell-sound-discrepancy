@@ -18,14 +18,15 @@ my %args = ( debug => 0, verbose => 0, drop_initial_r => 0,
     ON_filter => "", NC_filter => "", drop_initial_n => 0, show_source => 0
 ) ;
 GetOptions (\%args,
-     "help|h",              # print help
-     "debug|d",             # debug option
-     "verbose|v",           # verbose option
-     "drop_initial_r|r",    # drop intial /ɹ/ option
-     "drop_initial_n|n",    # drop intial /ŋ/ option
-     "show_source|s",       # show sources
-     "ON_filter|O=s",       # specifies value for NC_filter
-     "NC_filter|C=s",       # specifies value for NC_filter
+     "help|h",            # print help
+     "debug|d",           # debug option
+     "verbose|v",         # verbose option
+     "NC_based|p",        # prepending ON to NC rather than appending NC to ON
+     "drop_initial_r|r",  # drop intial /ɹ/ option
+     "drop_initial_n|n",  # drop intial /ŋ/ option
+     "show_source|s",     # show sources
+     "ON_filter|O=s",     # specifies value for NC_filter
+     "NC_filter|C=s",     # specifies value for NC_filter
 ) ;
 print_help() if $args{help} ;
 
@@ -53,6 +54,7 @@ my $pair_sep  = ":" ;
 my $spell_sep = "[/#]" ;
 my $joiner1   = "\n";
 my $joiner2   = ",";
+my $targetN   = "" ; # global
 
 # IPA symbol classes defned
 # Class
@@ -122,34 +124,67 @@ print Dumper \@NC_data if $args{debug} ;
 @NC_data = grep { $_ =~ /:/ } @NC_data ;
 print Dumper \@NC_data if $args{debug} ;
 
-## process over ON lines
-foreach my $ON ( @ON_data ) {
-    print "# processing \$ON: $ON\n" if $args{verbose} ;
-    # sound match for Necleus
-    my @NC_matches = &find_NC_matches ($ON) ;
-    printf "# found %d \@NC_matches: @NC_matches\n", (scalar @NC_matches) if $args{verbose} ;
-    ## compose ON and NC
-    foreach my $NC (@NC_matches) {
-        print "# \$NC: $NC\n" if $args{debug} ;
-        my $ONC = &merge_ON_and_NC ($ON, $NC) ;
-        print "$ONC\n" ;
+## combine ON and NC data
+if ( $args{NC_based} ) {
+    ## process over NC lines
+    foreach my $NC ( @NC_data ) {
+        print "# processing \$NC: $NC\n" if $args{verbose} ;
+        # sound match for Necleus
+        my @ON_matches = &find_ON_matches ($NC) ;
+        printf "# found %d \@ON_matches: @ON_matches\n", (scalar @ON_matches) if $args{verbose} ;
+        ## compose ON and NC
+        foreach my $ON ( @ON_matches ) {
+            print "# \$ON: $ON\n" if $args{debug} ;
+            my $ONC = &merge_ON_and_NC ( $ON, $NC ) ;
+            print "$ONC\n" ;
+        }
+    }
+} else {
+    ## process over ON lines
+    foreach my $ON ( @ON_data ) {
+        print "# processing \$ON: $ON\n" if $args{verbose} ;
+        # sound match for Necleus
+        my @NC_matches = &find_NC_matches ($ON) ;
+        printf "# found %d \@NC_matches: @NC_matches\n", (scalar @NC_matches) if $args{verbose} ;
+        ## compose ON and NC
+        foreach my $NC ( @NC_matches ) {
+            print "# \$NC: $NC\n" if $args{debug} ;
+            my $ONC = &merge_ON_and_NC ($ON, $NC) ;
+            print "$ONC\n" ;
+        }
     }
 }
 
 ### functions
 sub find_NC_matches {
     my @matchedNC = ( ) ;
-    my $xON = shift ;
-    print "# \$xON: $xON\n" if $args{debug} ;
-    $xON =~ /($ipaClassNucleus):/ ;
-    my $targetN = $1 ;
+    my $key_ON = shift ;
+    print "# \$key_ON: $key_ON\n" if $args{debug} ;
+    $key_ON =~ /($ipaClassNucleus):/ ;
+    $targetN = $1 ;
     if ( defined $targetN ) {
         print "# \$targetN: $targetN\n" if $args{debug} ;
-        my @matched = grep { $_ =~ /($ipaClassOnset)*$targetN:/ } @NC_data ;
+        #my @matched = grep { $_ =~ /($ipaClassOnset)*$targetN:/ } @NC_data ;
+        my @matched = grep { $_ =~ /^$targetN($ipaClassCoda)*:/ } @NC_data ;
         printf "# \@matched: %s\n", ( join $joiner2, @matched ) if $args{debug} ;
         push @matchedNC, @matched ;
     }
     return @matchedNC ;
+}
+##
+sub find_ON_matches {
+    my @matchedON = ( ) ;
+    my $key_NC = shift ;
+    print "# \$key_NC: $key_NC\n" if $args{debug} ;
+    $key_NC =~ /^($ipaClassNucleus)/ ;
+    $targetN = $1 ;
+    if ( defined $targetN ) {
+        print "# \$targetN: $targetN\n" if $args{debug} ;
+        my @matched = grep { $_ =~ /($ipaClassOnset)*$targetN:/ } @ON_data ;
+        printf "# \@matched: %s\n", ( join $joiner2, @matched ) if $args{debug} ;
+        push @matchedON, @matched ;
+    }
+    return @matchedON ;
 }
 
 ##
