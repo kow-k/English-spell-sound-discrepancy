@@ -52,11 +52,11 @@ ON=>NCの自動変換の精度は100%ではないため，若干の誤りが含�
 
 # 論文/paper
 
-- [PDF](https://www.jcss.gr.jp/meetings/jcss2023/proceedings/pdf/X.pdf)
+- [PDF](https://www.jcss.gr.jp/meetings/jcss2023/proceedings/pdf/JCSS2023_P3-026.pdf)
 
 # ポスター/poster
 
-- [PDF](https://www.dropbox.com/X)
+- [PDF](https://www.dropbox.com/scl/fi/6ih342ehd5ph30wf2mnhg/kuroda-jcss40-poster.pdf?rlkey=0ho95h7c190hros5rq2d4bc62&dl=0)
 
 
 # Resources
