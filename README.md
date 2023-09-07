@@ -39,13 +39,20 @@ ON-NC converter のGerman 対応は今のところ不完全
 
 ON=>NCの自動変換の精度は100%ではないため，若干の誤りが含まれる可能性が大．
 
+[4] ON対応 (1gram) とNC対応 (1gram) から合成したONC対応 (2gram規模)
+
+- [英語 spell.size で層別化した版](English/instances-ONC-NC-append-spell-size-classified.xlsx)
+- [英語 spell.size で層別化していない版](English/instances-ONC-NC-append-spell-size-classified.xlsx)
+
+合成法は NC に ON を prepend する方法と， ON に NC を append する方法とがあり，このデータは後者の方法で生成した．
+
 ## ドイツ語データ
 
-[4] 1k most common words のドイツ語版の，発音と綴りの対応関係をする抽出ための Excel 作業本:
+[5] 1k most common words のドイツ語版の，発音と綴りの対応関係をする抽出ための Excel 作業本:
 
 - [ドイツ語 (1k most commons) spell-sound 対応づけデータ](German/base-German-ipa-spell-ON-pairs-r1-1k-mc.xlsx)
 
-[5] から構築したドイツ語の spell-sound 対応 (1-gram, 2-gram, 3-gram):
+[6] から構築したドイツ語の spell-sound 対応 (1-gram, 2-gram, 3-gram):
 
 - [ドイツ語 (1k most commons) 1,2,3-gram](German/data-German-spell-sound-ON-pairing-r1a-ngram-1k.xlsx)
 
