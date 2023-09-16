@@ -21,13 +21,32 @@
 # 2023/08/10: added /y/ to Vchar classes
 # 2023/08/22: added /j/ to Vchar classes, modified to handle IPA symbols for German 
 # 2023/08/24: revised V matching to allow for N with tailing /ɹ/ in NC mode
+# 2023/09/12: modified $Vchar-related variables
 
 ## declarations
 use strict ;
 use warnings ;
-use Getopt::Long ;
 use List::Util qw(all any) ;
+
+## options
+use Getopt::Long ;
+my %args = ( debug => 0, verbose => 0, r_as_V => 0, h_as_V => 0, mark_missing => 0 );
+GetOptions(\%args,
+   "help",           # print help
+   "debug|d",        # runs in debug mode
+   "verbose|v",      # runs in verbose mode
+   "r_as_V|r",       # treats [ɹ] as a vowel, effective in NC mode
+   "h_as_V|h",       # treats [h] as a vowel, effective in ON mode
+   "inverted|i",     # inverts ipa-spell order in pairing
+   "unstrip|u",      # retains stress-marks and slashes
+   "mark_missing|m", # insert '_' for missing character
+   "bigram|b",     # runs in bigram mode
+   "trigram|t",    # runs in bigram mode
+   "extensive|e"   # bigrams extend unigrams
+) ;
+
 #use feature 'unicode_strings' ;
+#use Encode qw(decode_utf8) ; # Stackoverflow
 use utf8 ;
 #use open IO => ":locale" ;
 use open IO => ":utf8" ; # This dispenses with the following;
@@ -36,7 +55,6 @@ my $enc = "utf8" ;
 binmode STDIN,  ":$enc" ;
 binmode STDOUT, ":$enc" ;
 binmode STDERR, ":$enc" ;
-#use Encode qw(decode_utf8) ; # Stackoverflow
 
 ## variables and constants
 my $leader_sep = ": " ;
@@ -59,22 +77,6 @@ my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
 my $VcharPlusR2  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  # picks up /ɹ/ alone successfully
 my $VcharPlusHR = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
 my $VcharPlusHR2 = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?|ɹ)" ;
-
-## options
-my %args = ( debug => 0, verbose => 0, r_as_V => 0, h_as_V => 0, mark_missing => 0 );
-GetOptions(\%args,
-   "help",           # print help
-   "debug|d",        # runs in debug mode
-   "verbose|v",      # runs in verbose mode
-   "r_as_V|r",       # treats [ɹ] as a vowel, effective in NC mode
-   "h_as_V|h",       # treats [h] as a vowel, effective in ON mode
-   "inverted|i",     # inverts ipa-spell order in pairing
-   "unstrip|u",      # retains stress-marks and slashes
-   "mark_missing|m", # insert '_' for missing character
-   "bigram|b",     # runs in bigram mode
-   "trigram|t",    # runs in bigram mode
-   "extensive|e"   # bigrams extend unigrams
-) ;
 
 ## handle implications
 if ( $args{debug} ) { $args{verbose} = 1 ; }
