@@ -57,25 +57,25 @@ binmode STDOUT, ":$enc" ;
 binmode STDERR, ":$enc" ;
 
 ## variables and constants
-my $leader_sep = ": " ;
+my $leader_sep  = ": " ;
 #my $freq_leader = "\ +\d+\ +" ; # failed to work due to offensive \d
 my $freq_leader = "(^\ *[1-9][0-9]*\ +|^[0-9]+,)" ;
-my $sep0  = "[,\t]" ; # handles csv and tsv files
-my $vseq  = "," ;
-my $fseq  = ";" ;
-my $ipa_sep = "[0123#]" ;
-my $spell_sep = "[/#]" ;
-my $joint = ":";
-my $v_bond  = "~" ;
-my $void  = "#" ;
-my $missing = "";
+my $sep0        = "[,\t]" ; # handles csv and tsv files
+my $vseq        = "," ;
+my $fseq        = ";" ;
+my $ipa_sep     = "[0123#]" ;
+my $spell_sep   = "[/#]" ;
+my $joint       = ":";
+my $v_bond      = "~" ;
+my $void        = "#" ;
+my $missing     = "";
 
 ## IPA matching conditions
-my $Vchar       = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
-my $VcharPlusH  = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
-my $VcharPlusR  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
+my $Vchar        = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+my $VcharPlusH   = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+)" ;
+my $VcharPlusR   = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
 my $VcharPlusR2  = "([əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+|ɹ)" ;  # picks up /ɹ/ alone successfully
-my $VcharPlusHR = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
+my $VcharPlusHR  = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?)" ;
 my $VcharPlusHR2 = "(h?[əɚɜɝaɑɒæʌɛeɪiɨoɔuʊːɐœøʏɑ̃]+ɹ?|ɹ)" ;
 
 ## handle implications
@@ -85,25 +85,25 @@ if ( $args{mark_missing} ) { $missing = "_" ;}
 ## main
 my ($i, $j) = (0, 0) ;
 while ( my $line = <> ) {
-   print $line if $args{debug};
-   chomp $line;
-   next if $line =~ /^[#%]/; # ignores comment lines
+   print $line if $args{debug} ;
+   chomp $line ;
+   next if $line =~ /^[#%]/ ; # ignores comment lines
    ## remove freq_leader
-   $line =~ s/$freq_leader//;
-   my ($leader, $pair_raw);
+   $line =~ s/$freq_leader// ;
+   my ($leader, $pair_raw) ;
    if ( $line =~ /$leader_sep/ ) {
       my @seg = split $leader_sep, $line;
-      $leader = $seg[0];
-      $pair_raw = $seg[scalar @seg - 1];
+      $leader = $seg[0] ;
+      $pair_raw = $seg[scalar @seg - 1] ;
    } else {
-      $leader = undef;
-      $pair_raw = $line;
+      $leader = undef ;
+      $pair_raw = $line ;
    }
    ## analyze input
-   my ($ipa, $slashed) = split $sep0, $pair_raw;
-   print "# ipa: $ipa; slashed: $slashed\n" if $args{debug};
+   my ($ipa, $slashed) = split $sep0, $pair_raw ;
+   print "# ipa: $ipa; slashed: $slashed\n" if $args{debug} ;
    #
-   my ($sound, $spell);
+   my ($sound, $spell) ;
    if ( $args{unstrip} ) {
       $sound = $ipa ;
       $spell  = $slashed ;
@@ -122,7 +122,7 @@ while ( my $line = <> ) {
    if ( $args{debug} ) {
       print "\n" ;
       for my $i ( 0 .. @ipa_segs ) {
-         print "# ipa_seg$i: $ipa_segs[$i]\n" if defined $ipa_segs[$i];
+         print "# ipa_seg$i: $ipa_segs[$i]\n" if defined $ipa_segs[$i] ;
       }
    }
    ## get spell segments
@@ -146,13 +146,13 @@ while ( my $line = <> ) {
             if ( $args{r_as_V} ) {
                $ipa_seg =~ m/$VcharPlusHR/ ; # Crucially ...\b here.
                if ( defined $1 ) {
-                  $v_cluster[$k] = $1 if ( $1 =~ /$VcharPlusHR/ );
+                  $v_cluster[$k] = $1 if ( $1 =~ /$VcharPlusHR/ ) ;
                } 
             } else {
                $ipa_seg =~ m/$VcharPlusH/ ;
                if ( defined $1 ) {
-                  $v_cluster[$k] = $1 if ( $1 =~ /$VcharPlusH/ );
-               } 
+                  $v_cluster[$k] = $1 if ( $1 =~ /$VcharPlusH/ ) ;
+               }
             }
          } else {
             if ( $args{r_as_V} ) {
@@ -167,7 +167,6 @@ while ( my $line = <> ) {
                }
             }
          }
-         #$v_cluster[$k] = $1 ; returns digits like "1", "2"
       }
    }
    print "# \@v_cluster: @v_cluster\n" if $args{debug};
